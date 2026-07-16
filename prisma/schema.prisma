@@ -1,0 +1,46 @@
+datasource db {
+  provider = "postgresql"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  PROVIDER
+  CUSTOMER
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  name      String
+  role      Role     @default(CUSTOMER)
+  timezone  String   @default("UTC") // Preferred timezone
+  
+  // Relations
+  providedSlots Slot[]   @relation("ProviderSlots")
+  bookings      Slot[]   @relation("CustomerBookings")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Slot {
+  id          String   @id @default(uuid())
+  startTime   DateTime // UTC
+  endTime     DateTime // UTC
+  
+  // Relations
+  providerId  String
+  provider    User     @relation("ProviderSlots", fields: [providerId], references: [id], onDelete: Cascade)
+  
+  bookedById  String?
+  bookedBy    User?    @relation("CustomerBookings", fields: [bookedById], references: [id], onDelete: SetNull)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([providerId])
+  @@index([bookedById])
+  @@index([startTime])
+}

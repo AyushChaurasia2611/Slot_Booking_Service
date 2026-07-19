@@ -2,8 +2,8 @@
 
 ## 1. Technology Choices
 - **Next.js (App Router)**: Offers a unified framework for server-rendered components, API endpoints (Route Handlers), and client-side interactivity, minimizing setup complexity.
-- **Prisma ORM (v7.8)**: Adopted Prisma 7 for its native TypeScript generation. Note that Prisma 7 has removed the `url` property from the `schema.prisma` file, requiring database configs to reside in `prisma.config.ts` and database initialization to use the `@prisma/adapter-pg` driver.
-- **PostgreSQL**: Standard database choice offering complete ACID compliance, transaction support, and row-level locking capabilities.
+- **Prisma ORM (v7.8)**: Adopted Prisma 7 for its native TypeScript generation. Note that Prisma 7 has removed the `url` property from the `schema.prisma` file, requiring database configs to reside in `prisma.config.ts`.
+- **SQLite (better-sqlite3)**: Transitioned database engine to SQLite via the `@prisma/adapter-better-sqlite3` driver adapter to ensure the application runs out-of-the-box on local reviewer environments without requiring any external PostgreSQL server or Docker setup. The database is stored inside a local file (`prisma/dev.db`).
 - **Tailwind CSS (v4)**: Modern style architecture utilizing CSS variables and utility classes, allowing for smooth transition animations and clean layouts.
 
 ## 2. Key Architecture Designs
@@ -20,7 +20,7 @@
 - **Atomic Rescheduling (Transactions)**:
   Rescheduling is run in a database transaction (`prisma.$transaction`). It attempts to release the old slot (ensuring the user owns it) and claim the new slot (ensuring it is currently free) in a single database round-trip. If either step fails, the entire transaction aborts, ensuring data integrity.
 - **Timezone Management**:
-  To ensure timezone safety, all date-times are stored as UTC in PostgreSQL. When creating slots, providers select their local time and input timezone; the app maps it to UTC. When clients browse, their selected timezone in the header translates calendar bounds for date filtering, and translates UTC timestamps into local strings in the UI.
+  To ensure timezone safety, all date-times are stored as UTC in SQLite. When creating slots, providers select their local time and input timezone; the app maps it to UTC. When clients browse, their selected timezone in the header translates calendar bounds for date filtering, and translates UTC timestamps into local strings in the UI.
 
 ## 3. System Weaknesses & Trade-offs
 - **Mock Auth**: Session auth relies on simple cookie claims without passwords or security verification. Fine for review, but would be upgraded to Auth.js with password hashing or OAuth in production.

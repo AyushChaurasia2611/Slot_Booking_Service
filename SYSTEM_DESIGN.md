@@ -6,13 +6,13 @@ This document explains the system design, architecture, database design, and key
 
 ## 1. System Architecture
 
-The application is structured as a three-tier architecture utilizing Next.js (App Router), Prisma, and PostgreSQL.
+The application is structured as a three-tier architecture utilizing Next.js (App Router), Prisma, and SQLite.
 
 ```mermaid
 graph TD
     A[Client Browser] -->|HTTP Requests| B[Next.js App Server]
     B -->|API Routes / App Context| C[Route Handlers / API]
-    C -->|Prisma Client| D[PostgreSQL Database]
+    C -->|Prisma Client| D[SQLite Database]
     
     subgraph UI Components
         A1[Header / Auth Switcher]
@@ -88,7 +88,7 @@ sequenceDiagram
     actor CustomerA as Customer A
     actor CustomerB as Customer B
     participant API as Bookings API (/api/bookings)
-    participant DB as PostgreSQL Database
+    participant DB as SQLite Database
 
     CustomerA->>API: POST /api/bookings (slotId = "S1")
     CustomerB->>API: POST /api/bookings (slotId = "S1")
@@ -116,7 +116,7 @@ sequenceDiagram
     autonumber
     actor Customer as Customer
     participant API as Bookings API (PUT /api/bookings)
-    participant DB as PostgreSQL Database
+    participant DB as SQLite Database
 
     Customer->>API: Reschedule (Old Slot = "S1", New Slot = "S2")
     
@@ -150,12 +150,12 @@ Timezone synchronization is resolved by decoupling **storage**, **creation**, an
 |    - Alice inputs: 2026-07-17 at 9:00 AM (America/NY)   |
 |    - System converts input local time to UTC:          |
 |      "2026-07-17 09:00:00" @ New York -> 1:00 PM UTC   |
-|    - Stored in PostgreSQL: "2026-07-17T13:00:00Z"      |
+|    - Stored in SQLite: "2026-07-17T13:00:00Z"          |
 +--------------------------+-----------------------------+
                            |
                            v
 +--------------------------------------------------------+
-| 2. STORAGE (PostgreSQL Database)                       |
+| 2. STORAGE (SQLite Database)                           |
 |    - Always stored in UTC format.                      |
 +--------------------------+-----------------------------+
                            |

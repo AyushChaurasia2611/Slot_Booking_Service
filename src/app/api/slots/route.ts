@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { getCurrentUser } from '@/lib/auth';
 import { getDateBoundsInTimezone } from '@/lib/timezone';
-import { Role } from '@prisma/client';
 
 // GET /api/slots - Paginated and filtered slot listings
 export async function GET(req: NextRequest) {
@@ -88,7 +87,7 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const currentUser = await getCurrentUser();
-    if (!currentUser || currentUser.role !== Role.PROVIDER) {
+    if (!currentUser || currentUser.role !== 'PROVIDER') {
       return NextResponse.json({ error: 'Unauthorized. Provider access only.' }, { status: 401 });
     }
 

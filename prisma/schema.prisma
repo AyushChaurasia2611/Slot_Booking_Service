@@ -1,21 +1,16 @@
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
 }
 
 generator client {
   provider = "prisma-client-js"
 }
 
-enum Role {
-  PROVIDER
-  CUSTOMER
-}
-
 model User {
   id        String   @id @default(uuid())
   email     String   @unique
   name      String
-  role      Role     @default(CUSTOMER)
+  role      String   @default("CUSTOMER") // "PROVIDER" | "CUSTOMER"
   timezone  String   @default("UTC") // Preferred timezone
   
   // Relations

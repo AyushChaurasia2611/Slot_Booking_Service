@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { getCurrentUser } from '@/lib/auth';
-import { Role } from '@prisma/client';
 
 // GET /api/bookings - Lists the current user's bookings (either customer bookings or provider bookings)
 export async function GET(req: NextRequest) {
@@ -12,7 +11,7 @@ export async function GET(req: NextRequest) {
     }
 
     const where: any = {};
-    if (currentUser.role === Role.PROVIDER) {
+    if (currentUser.role === 'PROVIDER') {
       where.providerId = currentUser.id;
       where.bookedById = { not: null }; // Providers see booked slots
     } else {
@@ -59,7 +58,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized. Please sign in.' }, { status: 401 });
     }
 
-    if (currentUser.role !== Role.CUSTOMER) {
+    if (currentUser.role !== 'CUSTOMER') {
       return NextResponse.json({ error: 'Only customers can book slots.' }, { status: 403 });
     }
 
@@ -123,8 +122,8 @@ export async function DELETE(req: NextRequest) {
 
     // Customers can cancel their own bookings, Providers can cancel bookings made on their slots
     const isAuthorized =
-      (currentUser.role === Role.CUSTOMER && slot.bookedById === currentUser.id) ||
-      (currentUser.role === Role.PROVIDER && slot.providerId === currentUser.id);
+      (currentUser.role === 'CUSTOMER' && slot.bookedById === currentUser.id) ||
+      (currentUser.role === 'PROVIDER' && slot.providerId === currentUser.id);
 
     if (!isAuthorized) {
       return NextResponse.json({ error: 'Unauthorized to cancel this booking.' }, { status: 403 });
@@ -153,7 +152,7 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized. Please sign in.' }, { status: 401 });
     }
 
-    if (currentUser.role !== Role.CUSTOMER) {
+    if (currentUser.role !== 'CUSTOMER') {
       return NextResponse.json({ error: 'Only customers can reschedule bookings.' }, { status: 403 });
     }
 

@@ -1,6 +1,17 @@
-import { PrismaClient, Role } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
+import { PrismaBetterSqlite3 } from '@prisma/adapter-better-sqlite3';
 
-const prisma = new PrismaClient();
+const connectionString = process.env.DATABASE_URL;
+if (!connectionString) {
+  throw new Error('DATABASE_URL is not set');
+}
+const adapter = new PrismaBetterSqlite3({ url: connectionString });
+const prisma = new PrismaClient({ adapter });
+
+const Role = {
+  PROVIDER: 'PROVIDER',
+  CUSTOMER: 'CUSTOMER',
+} as const;
 
 async function main() {
   console.log('Clearing database...');
